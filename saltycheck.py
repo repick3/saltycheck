@@ -9,18 +9,30 @@ import scheduling
 import settings
 
 class TournamentStatus(Enum):
+    '''
+    All possible states of saltybet handled
+    '''
     SOON = 1
     IN_PROGRESS = 2
     NOT_EVEN_CLOSE = 3
     UH_OH =  4
 
 class SaltyStatus(object):
+    '''
+    Simple object for passing status, text, and match count around.
+    '''
+
     def __init__(self, status, text=None, matches_left=None):
         self.status = status
         self.text = text
         self.matches_left = matches_left
 
+
 async def get_salty_status():
+    '''
+    Queries saltybet for the current status.jsonm
+    '''
+
     r = requests.get("http://saltybet.com/state.json")
 
     if r.ok:
@@ -30,6 +42,12 @@ async def get_salty_status():
 
 
 async def get_matches_until(input_string, mode="tournament"):
+    '''
+    Simple regex to return the amount of matches left in the string. The pattern
+    seems to always have integers starting the string unless it is the LAST
+    match before a tournament or the final round of a tournament.
+    '''
+
     if mode == "tournament":
         m = re.search("\d+", input_string)
         if m:
@@ -39,6 +57,11 @@ async def get_matches_until(input_string, mode="tournament"):
 
 
 async def check_for_tournament(input_string):
+    '''
+    Builds the SaltyStatus based on the "remaining" key retrieved from saltybet.
+    Uses naive string searching to determine status.
+    '''
+
     if 'remaining' in input_string:
         remaining_string = input_string["remaining"].lower()
     else:
@@ -73,7 +96,9 @@ async def check_for_tournament(input_string):
 
 
 async def format_tourney_string(matches):
-
+    '''
+    Handles the output of the alert messages depending on matches left
+    '''
     if matches <= 10:
         return(f"Tournament INCOMING! Matches left: {matches}")
         
@@ -87,6 +112,9 @@ async def format_tourney_string(matches):
 
 
 async def get_mode():
+    '''
+    Does a simple check on the fly if someone requests it.
+    '''
     salty_status = await get_salty_status()
 
     if "remaining" in salty_status:
@@ -96,6 +124,11 @@ async def get_mode():
 
 
 async def update_presence(client, status):
+    '''
+    Updates the Discord presence based on status.
+    TODO: display current mode for matchmaking/exbo/waifuwarz
+    '''
+
     if status == TournamentStatus.SOON:
         await client.change_presence(game=discord.Game(name='Tournament Spotted!'))
     elif status == TournamentStatus.IN_PROGRESS:
@@ -105,6 +138,11 @@ async def update_presence(client, status):
 
 
 async def salty_checker(client):
+    '''
+    Main task loop.
+    Handles periodically checking saltybet and alerting channels defined in settings.py
+    '''
+
     await client.wait_until_ready()
     next_alert_pattern = itertools.cycle(scheduling.ALERT_MILESTONES)
     next_alert = next(next_alert_pattern)
