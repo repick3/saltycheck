@@ -153,11 +153,6 @@ async def salty_checker(client):
         salty_status = await get_salty_status()
         current_status = await check_for_tournament(salty_status)
 
-        channels = [
-            discord.Object(id="406325042113150978")
-        ]
-
-        print(current_status.status)
         await update_presence(client, current_status.status)
 
         if current_status.status == TournamentStatus.SOON:
