@@ -4,6 +4,8 @@ import asyncio
 from discord.ext.commands import Bot
 from discord.ext import commands
 import platform
+import logging
+from logging.config import dictConfig
 
 import saltycheck
 import nightbot
@@ -11,6 +13,8 @@ import settings
 
 # Here you can modify the bot's prefix and description and wether it sends help in direct messages or not.
 client = Bot(description="repick's rebot", command_prefix="$", pm_help = False)
+
+dictConfig(settings.LOGGING_CONFIG)
 
 # This is what happens everytime the bot launches. In this case, it prints information like server count, user count the bot is connected to, and the bot id in the console.
 # Do not mess with it because the bot can break, if you wish to do so, please consult me or someone trusted.
@@ -32,17 +36,19 @@ async def on_ready():
         for channel in server.channels:
             print(channel, channel.id)
 
-    # return await client.change_presence(game=discord.Game(name='PLAYING No Salt')) #This is buggy, let us know if it doesn't work.
-    # return await client.change_presence() #This is buggy, let us know if it doesn't work.
+
+    with open("emoji.txt", "w") as emoji_file:
+        for e in client.get_all_emojis():
+            emoji_file.write(e.name + ": "+ str(e) + "\n")
+
     return client
 
-# This is a basic example of a call and response command. You tell it do "this" and it does it.
+
 @client.command()
 async def ping(*args):
     '''Say that to my face fucker and not online and see what happens'''
 
-    await client.say(":galaxybrain:")
-# After you have modified the code, feel free to delete the line above so it does not keep popping up everytime you initiate the ping commmand.
+    await client.say("<:galaxybrain:391049584496869376>")
     
 
 @client.command()
@@ -54,6 +60,22 @@ async def check(*args):
 
 
 @client.command()
+async def bet(*args):
+    '''
+    Original chat commands. Learn the lore to use them.
+    '''
+
+    whomst_bet = args[0]
+    if whomst_bet:
+        if whomst_bet in ["robot", ""]:
+            await client.say("<:thinking2:281654414605942784>")
+        elif whomst_bet in ["sword"]:
+            await client.say("<:buenopapa:318226335640322050>")
+        elif whomst_bet in ["anime", "tiddys"]:
+            await client.say("<:obongo:364234932731641856>")
+
+
+@client.command()
 async def salt(*args):
     '''Say a saltybet nightbot command.'''
     try:
@@ -61,10 +83,6 @@ async def salt(*args):
     except:
         nightbot_text = "Try again gamer"
     await client.say(nightbot_text)
-
-# @client.command()
-# async def kill(*args):
-#     exit()
 
 
 client.loop.create_task(saltycheck.salty_checker(client))
