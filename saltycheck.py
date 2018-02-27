@@ -33,7 +33,7 @@ async def get_salty_status():
     Queries saltybet for the current status.jsonm
     '''
 
-    r = requests.get("http://saltybet.com/state.json")
+    r = requests.get("http://www.saltybet.com/state.json")
 
     if r.ok:
         return r.json()
