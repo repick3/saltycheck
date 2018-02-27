@@ -61,6 +61,12 @@ async def check_for_tournament(input_string):
     Builds the SaltyStatus based on the "remaining" key retrieved from saltybet.
     Uses naive string searching to determine status.
     '''
+    if not input_string:
+        salty_status = SaltyStatus(
+            TournamentStatus.UH_OH,
+            text="Couldn't get the status of salty bet dot com."
+        )
+        return salty_status
 
     if 'remaining' in input_string:
         remaining_string = input_string["remaining"].lower()
