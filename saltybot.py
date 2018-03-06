@@ -75,6 +75,8 @@ async def bet(*args):
             await client.say("<:obongo:364234932731641856>")
         elif whomst_bet in ["trash"]:
             await client.say("https://imgur.com/TshINFD")
+        elif whomst_bet in ["bird", "birdgang", "caw"]:
+            await client.say("<:cockle:420460828337111050>")
 
 
 @client.command()
